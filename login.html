@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dharavi - Login</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <header>
+      <nav>
+        <div class="container">
+          <a href="index.html" class="logo"></a>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="login.html">Sign in/up</a></li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <div class="container">
+        <div class="login-form" style="top: 35%;position: absolute;left: 40%;width: 20%;">
+          <form id="login-form">
+            <label for="username">Username:</label>
+            <input style="width: 90%;" maxlength="10" minlength="1" type="text" id="username" name="username" required>
+            <label for="password">Password:</label>
+            <input style="width: 90%;" maxlength="10" minlength="1" type="password" id="password" name="password" required>
+            <button type="submit" id="signin-btn">Sign in / Sign up</button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-firestore.js"></script>
+
+    <script>
+
+      console.log(URLSearchParams);
+
+      // Initialize Firebase
+      var firebaseConfig = {
+        apiKey: "AIzaSyAPVwFxOeXgjXVTo67yV1aPM3UXwNQ3sxE",
+        authDomain: "dharavi-25111.firebaseapp.com",
+        projectId: "dharavi-25111",
+        storageBucket: "dharavi-25111.appspot.com",
+        messagingSenderId: "314307463361",
+        appId: "1:314307463361:web:e2c14aed3b62199971ec40",
+        measurementId: "G-WXT98RZSPR"
+      };
+      firebase.initializeApp(firebaseConfig);
+
+      var db = firebase.firestore();
+
+      var loginForm = document.getElementById('login-form');
+      loginForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // Stop the form submission from reloading the page
+
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+
+        db.collection("users").doc(username).get()
+          .then((doc) => {
+            if (doc.exists) {
+              // Username already exists, do something here
+              var str_realPass = doc.data()["password"];
+              if (password == str_realPass) {
+                alert("welcome back, "+username+"!")
+                localStorage.setItem("dharavi-session", username+"."+password)
+                window.location.href = "index.html";
+              } else {
+                alert("user exists, password is incorrect");
+              }
+            } else {
+              // Username doesn't exist, create a new user document
+              db.collection("users").doc(username).set({
+                password: password
+              })
+              .then(() => {
+                // Document created successfully
+                alert("welcome, "+username+"!")
+                console.log("doc created!");
+                localStorage.setItem("dharavi-session", username+"."+password)
+                window.location.href = "index.html";
+              })
+              .catch((error) => {
+                // Handle error
+                console.log(error);
+              });
+            }
+          })
+          .catch((error) => {
+            // Handle error
+            console.log(error);
+          });
+      });
+    </script>
+
+  </body>
+</html>

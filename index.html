@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Dharavi - Home</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+
+	<body>
+		<header>
+			<nav>
+			  <div class="container">
+				<a href="index.html" class="logo"></a>
+				<ul>
+				  <li><a href="index.html">Home</a></li>
+				  <li><a href="login.html">Sign in/up</a></li>
+				</ul>
+			  </div>
+			</nav>
+
+			<div class="post-box">
+				<textarea id="main-thingy-entry" maxlength="50" placeholder="What's on your monkey brain?" style="position: absolute;left: 39.5%;width: 20%;height: 10%;"></textarea>
+				<button onclick="post()" type="submit" style="position: absolute;left: 47.5%;width: 5%;top: 25%;">spit</button>
+			</div>
+		</header>
+
+		<main>
+			<div>
+				<h1>adictiv scrolin' tiem</h1>
+				<div id="post-container" style="position: absolute;width: 25%;height: 60%;left: 38%;top: 35%;">
+					<!-- The latest posts will be dynamically generated here -->
+					<div class="post" id="post-template" style="display: none;width: 100%;left: -7.5%;position: relative;height: 30%;margin-bottom: 30px;">
+						<div class="post-header">
+						  <h2 class="post-title" style="top: -5%;position:absolute;color: #498cd8;">Quandale Pringle</h2>
+						  <p class="post-date" style="position: absolute;left: 80%;top: 2.5%;color: #929292;">07//3/2023</p>
+						</div>
+						<p class="post-content" style="top:10%;position: relative;color: #eeeeee;height: 50%;font-size: 125%;">i have 69420 legalised nuclear bombs 🤟🏾🤟🏾</p>
+					</div>
+				</div>
+			</div>
+		</main>
+	</body>
+
+
+	<script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-firestore.js"></script>
+  
+	<script>  
+	  	// Initialize Firebase
+	  	var firebaseConfig = {
+			apiKey: "AIzaSyAPVwFxOeXgjXVTo67yV1aPM3UXwNQ3sxE",
+			authDomain: "dharavi-25111.firebaseapp.com",
+			projectId: "dharavi-25111",
+			storageBucket: "dharavi-25111.appspot.com",
+			messagingSenderId: "314307463361",
+			appId: "1:314307463361:web:e2c14aed3b62199971ec40",
+			measurementId: "G-WXT98RZSPR"
+	  	};
+	  	firebase.initializeApp(firebaseConfig);
+	  
+	  	var db = firebase.firestore();
+
+	  	function post() {  
+			const now = (Date.now() * 0.001);
+  			const lastPostTime = localStorage.getItem("dharavi-cooldown")
+  			const cooldownPeriod = 5
+
+  			if ((now - cooldownPeriod) < lastPostTime) {
+  			  alert("please wait a minute");
+  			  return;
+  			}
+
+			db.collection("posts").doc((10000000000000000 - Date.now()).toString()).set({
+				creator: localStorage.getItem("dharavi-session").split(".")[0],
+				content: document.getElementById("main-thingy-entry").value,
+				unix: Date.now().toString()
+    		})
+
+			localStorage.setItem("dharavi-cooldown", Date.now() * 0.001)
+
+			// window.location.href = "index.html";
+	  	}
+
+		function addPost(title, date, content) {
+		  // Select the post template
+		  const postTemplate = document.querySelector('#post-template');
+
+		  // Clone the template and make it visible
+		  const post = postTemplate.cloneNode(true);
+      	  post.style.display = "block";
+		  // Update the content of the cloned post
+		  post.querySelector('.post-title').textContent = title;
+		  post.querySelector('.post-date').textContent = date;
+		  post.querySelector('.post-content').textContent = content;
+		  // Append the cloned post to the post container
+		  const postContainer = document.querySelector('#post-container');
+		  postContainer.appendChild(post);
+		}
+
+		var posts = []
+
+		db.collection("posts").get().then((querySnapshot) => {
+			querySnapshot.forEach((doc) => {
+				posts.push(doc.data());
+			});
+
+			for (var i = 0; i < 25; i++) {
+				var date = "00/00/0000";
+
+				console.log()
+
+				addPost(posts[i]["creator"], date, posts[i]["content"])
+			}
+		});
+	</script>
+</html>
